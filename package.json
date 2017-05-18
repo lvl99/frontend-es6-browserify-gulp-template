@@ -1,7 +1,7 @@
 {
   "name": "frontend-es6-browserify-gulp",
   "version": "1.0.0",
-  "description": "A basic boilerplate for frontend JS apps",
+  "description": "A basic build template for frontend JS apps",
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
