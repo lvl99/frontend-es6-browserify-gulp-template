@@ -14,7 +14,8 @@ minification and concatenation which are run with `lazypipe`.
 
 There are some other ideas at play, namely using third-party vendor code as globals and how to include that into the
 build structure as well (notable for WordPress theme and plugin development). For this `browserify-shim` is required,
-especially if you need traditional node-like `require` behaviour on vendor code that don't support CommonJS modules.
+especially if you need traditional node-like `require` behaviour to interop with vendor code that don't support CommonJS
+modules.
 
 Some people prefer Webpack, but I still really like Browserify. Admittedly this structure is complex, but build tasks
 and folder layouts are really quite opinionated and sometimes need to cover a lot of bases. Consider this one of many
@@ -49,6 +50,13 @@ I hope this helps you to create your own successful app and build structure.
     gulpfile.js               # The gulp controller which collates all the tasks files
     package.json              # NPM package definition, plus some extra configuration options (see `gulpConfig`)
 ```
+
+
+## Why?
+
+1. Write in modular ES6 JavaScript
+2. Compile and package JS code into bundles
+3. Use CSS preprocessers (LESS and SCSS) 
 
 
 ## Conventions

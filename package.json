@@ -1,6 +1,6 @@
 {
-  "name": "frontend-es6-browserify-gulp",
-  "version": "1.0.0",
+  "name": "frontend-es6-browserify-gulp-template",
+  "version": "0.1.0",
   "description": "A basic build template for frontend JS apps",
   "main": "gulpfile.js",
   "scripts": {
@@ -72,7 +72,7 @@
     ]
   },
   "browserify-shim": {
-    "jquery": "jQuery:global"
+    "jquery": "global:jQuery"
   },
   "transform": [
     [
