@@ -54,10 +54,24 @@ I hope this helps you to create your own successful app and build structure.
 
 ## Why?
 
-1. Write in modular ES6 JavaScript
-2. Compile and package JS code into bundles
-3. Use CSS preprocessers (LESS and SCSS) 
+1. Write in modern ES6 JavaScript and transpile to ES5 JS for browser compatibility
+2. Compile and package modular JS code into bundles
+3. Use CSS preprocessors (LESS and SCSS) to compile CSS bundles and cross-browser compatibility (`autoprefixer`)
+4. Minify and concatenate JS and CSS bundles and third-party vendor code into as few files as possible to reduce
+loading time
 
+
+## Stuff to be careful about
+
+* Requiring too many `npm` packages may bloat your app JS code. Ensure everything included is necessary and required
+for your app development, and be aware of package dependencies. If your JS code compiles and minifies to >1MB then
+you're doing it wrong!
+* Set `gulpConfig.env` to `development`, `staging` or `production` to affect minification and sourcemap generation. 
+
+| Feature         | `development` | `staging` | `production` |
+|-----------------|---------------|-----------|--------------|
+| Minification    |      No       |    Yes    |     Yes      |
+| Source Maps     |      No       |    Yes    |     Yes      |
 
 ## Conventions
 
@@ -69,9 +83,12 @@ as to what the file is, and separates it from third-party vendor files which are
 
 ## Gulp Config
 
-There is a `gulpConfig` object in the `package.json`, which allows you to configure the build from one central point,
+There is a `gulpConfig` object in the `package.json` which allows you to configure the build from one central point,
 however this shouldn't be completely relied on to solve all your build configuration. It's probable you may need to
 extend or modify the existing task files to support your apps specific needs.
+
+As such, there is 'convention over configuration' at play and the `package.json` based configuration will solve your
+needs if you have nothing more or less to do that what is included in this template.
 
 
 ## Third-party vendor plugins
@@ -85,6 +102,10 @@ required, you may want to just upload the whole vendor folder, or cherry-pick wh
 
 For the vendor scripts which require certain variables, using Browserify wouldn't necessarily expose the `jQuery` object
 (or some scripts look for the `$` and not the `jQuery` variable) so using `browserify-shim` can help.
+
+Personally I prefer third-party vendor plugins managed with `npm` (or `bower`), but if you have some proprietary code or
+otherwise (or some vendor plugins have other assets, like images), you can include it and manage its integration in the
+build with the vendors tasks.
 
 
 ## Tests

@@ -11,7 +11,7 @@ let scss = require('gulp-sass')
 let autoprefixer = require('gulp-autoprefixer')
 
 module.exports = function (gulpConfig) {
-  // Need to put these here
+  // Need to put this here so it has access to the gulpConfig
   let cssTasks = require('./css')(gulpConfig)
 
   /**
@@ -29,8 +29,6 @@ module.exports = function (gulpConfig) {
       }
     }
   }, objectPath.get(gulpConfig, 'scss'))
-
-  console.log(scssConfig)
 
   /**
    * Compile SCSS files to CSS

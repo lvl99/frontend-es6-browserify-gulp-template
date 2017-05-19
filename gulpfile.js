@@ -27,7 +27,7 @@ let tasks = {
   css: require('./tasks/css')(gulpConfig),
   js: require('./tasks/js')(gulpConfig),
   vendors: require('./tasks/vendors')(gulpConfig),
-  bundles: require('./tasks/bundles')(gulpConfig),
+  browserify: require('./tasks/browserify')(gulpConfig),
   less: require('./tasks/less')(gulpConfig),
   scss: require('./tasks/scss')(gulpConfig),
   jest: require('./tasks/jest')(gulpConfig)

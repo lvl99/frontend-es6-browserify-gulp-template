@@ -9,6 +9,7 @@ let path = require('path')
 let objectPath = require('object-path')
 let extend = require('extend')
 let browserify = require('browserify')
+let pkgify = require('pkgify')
 let watchify = require('watchify')
 let babelify = require('babelify')
 let streamify = require('gulp-streamify')
@@ -26,9 +27,9 @@ module.exports = function (gulpConfig) {
    * Default bundles config
    */
   let bundlesConfig = extend({
-    bundles: [],
+    bundles: {},
     useWatchify: false
-  }, objectPath.get(gulpConfig, 'bundles'))
+  }, objectPath.get(gulpConfig, 'browserify'))
 
   /**
    * Create a browserify-managed bundle
@@ -46,9 +47,10 @@ module.exports = function (gulpConfig) {
         entries: undefined,
         cache: {},
         packageCache: {},
-        extensions: ['.es6'],
+        extensions: ['.js', '.es6'],
         debug: true
       },
+      remapify: undefined,
       watchify: {
         poll: true
       }
@@ -70,11 +72,20 @@ module.exports = function (gulpConfig) {
       this.settings.browserify.entries = [this.settings.src]
     }
 
-    // Only if watching
+    // Create the browserify bundler (with Babel transforms)
+    this.bundler = browserify(this.settings.browserify).transform(pkgify).transform(babelify)
+
+    // Allow remapping of paths (a.k.a. path aliases) via pkgify
+    // if (this.settings.pkgify && this.settings.pkgify.length) {
+    //   this.bundler.transform(pkgify)
+    // }
+
+    // Do babel transform
+    // this.bundler.transform(babelify)
+
+    // Use watchify
     if (gulpConfig.isWatching || bundlesConfig.useWatchify || useWatchify) {
-      this.bundler = watchify(browserify(this.settings.browserify).transform(babelify), this.settings.watchify)
-    } else {
-      this.bundler = browserify(this.settings.browserify).transform(babelify)
+      this.bundler = watchify(this.bundler, this.settings.watchify)
     }
 
     /**
@@ -111,17 +122,16 @@ module.exports = function (gulpConfig) {
   function generateBundlers () {
     let bundleConfigs = bundlesConfig.bundles
 
-    if (!bundleConfigs.length) {
-      for (let i = 0; i < bundleConfigs.length; i++) {
-        let newBundler = new Bundler(bundleConfigs[i], gulpConfig.isWatching || bundlesConfig.useWatchify)
-        if (newBundler) {
-          bundlers[newBundler.settings.name] = newBundler
-          gutil.log(`Generated bundler ${newBundler.settings.name}`)
-        }
-      }
-      if (bundlers.length) {
-        gutil.log(`Generated ${bundlers.length} bundlers`)
-      }
+    for (let bundleName in bundleConfigs) {
+      try {
+        let newBundler = new Bundler(bundleConfigs[bundleName], gulpConfig.isWatching || bundlesConfig.useWatchify)
+        bundlers[bundleName] = newBundler
+        gutil.log(`Generated bundler ${newBundler.settings.name}`)
+      } catch (e) {}
+    }
+
+    if (bundlers.length) {
+      gutil.log(`Generated ${bundlers.length} bundlers`)
     }
   }
 

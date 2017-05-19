@@ -37,7 +37,6 @@ module.exports = function (gulpConfig) {
       // Process the config object which has a src property
       if (objectPath.has(vendorConfig, 'src')) {
         gutil.log(`Processing vendor config for ${vendorConfigName}`)
-        gutil.log(vendorConfig)
 
         // Set default vendor dest folder
         if (!objectPath.has(vendorConfig, 'dest')) {
