@@ -12,7 +12,7 @@ let autoprefixer = require('gulp-autoprefixer')
 
 module.exports = function (gulpConfig) {
   // Need to put these here
-  let cssTasks = require('./css')(gulpConfig)
+  let cssPipes = require('./css')(gulpConfig).pipes
 
   /**
    * Default LESS config
@@ -38,12 +38,14 @@ module.exports = function (gulpConfig) {
       .pipe(less(lessConfig.compileLess.less))
       .pipe(autoprefixer(lessConfig.compileLess.autoprefixer))
       .pipe(gulp.dest(lessConfig.compileLess.dest))
-      .pipe(gulpif(gulpConfig.env !== 'development', cssTasks.minifyCSS()))
+      .pipe(gulpif(gulpConfig.env !== 'development', cssPipes.minifyCSS()))
   }
 
   // Public (will be turned into gulp tasks)
   return {
-    _config: lessConfig,
-    compileLess
+    config: lessConfig,
+    tasks: {
+      compileLess
+    }
   }
 }

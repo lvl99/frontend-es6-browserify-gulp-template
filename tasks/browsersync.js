@@ -26,8 +26,10 @@ module.exports = function (gulpConfig) {
 
   // Public (will be turned into gulp tasks)
   return {
-    _config: browsersyncConfig,
-    _server: server, // This is so other tasks can reference the created browsersync server instance
-    startServer
+    config: browsersyncConfig,
+    server, // This is so other tasks can reference the created browsersync server instance
+    tasks: {
+      startServer
+    }
   }
 }

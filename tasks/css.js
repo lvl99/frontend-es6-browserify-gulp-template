@@ -48,8 +48,10 @@ module.exports = function (gulpConfig) {
 
   // Public (will be turned into gulp tasks)
   return {
-    _config: cssConfig,
-    minifyCSS,
-    concatCSS
+    config: cssConfig,
+    pipes: {
+      minifyCSS,
+      concatCSS
+    }
   }
 }

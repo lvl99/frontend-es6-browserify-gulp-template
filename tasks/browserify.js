@@ -24,8 +24,8 @@ let bundlers = {}
 
 module.exports = function (gulpConfig) {
   // Dependent tasks
-  let browsersyncServer = require('./browsersync')(gulpConfig)._server
-  let jsTasks = require('./js')(gulpConfig)
+  let browsersyncServer = require('./browsersync')(gulpConfig).server
+  let jsPipes = require('./js')(gulpConfig).pipes
 
   /**
    * Default bundles config
@@ -120,7 +120,7 @@ module.exports = function (gulpConfig) {
         .on('error', outputError)
         .pipe(source(this.destFile))
         .pipe(gulp.dest(this.dest))
-        .pipe(gulpif(gulpConfig.env === 'production', streamify(jsTasks.minifyJS())))
+        .pipe(gulpif(gulpConfig.env === 'production', streamify(jsPipes.minifyJS())))
         .pipe(gulpif(gulpConfig.env === 'production', gulp.dest(this.dest)))
         .pipe(gulpif(browsersyncServer && gulpConfig.isWatching || bundlesConfig.useWatchify || useWatchify, browsersyncServer.stream()))
     }
@@ -160,7 +160,9 @@ module.exports = function (gulpConfig) {
 
   // Public (will be turned into gulp tasks)
   return {
-    _config: bundlesConfig,
-    generateBundlers
+    config: bundlesConfig,
+    tasks: {
+      generateBundlers
+    }
   }
 }

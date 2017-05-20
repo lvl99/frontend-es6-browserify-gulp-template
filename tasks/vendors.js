@@ -83,7 +83,9 @@ module.exports = function (gulpConfig) {
 
   // Public (will be turned into gulp tasks)
   return {
-    _config: vendorsConfig,
-    processVendors
+    config: vendorsConfig,
+    tasks: {
+      processVendors
+    }
   }
 }

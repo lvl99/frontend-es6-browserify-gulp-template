@@ -34,6 +34,7 @@
     "extend": "^3.0.1",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^4.0.0",
+    "gulp-changed": "^3.1.0",
     "gulp-concat": "^2.6.1",
     "gulp-if": "^2.0.2",
     "gulp-less": "^3.3.0",
@@ -89,9 +90,13 @@
       "@app": "./src/js"
     }
   },
- "jest": {
+  "jest": {
     "browser": true,
-    "moduleFileExtensions": ["js", "es6", "jsx"],
+    "moduleFileExtensions": [
+      "js",
+      "es6",
+      "jsx"
+    ],
     "testMatch": [
       "**/__tests__/**/*.(jsx?|es6)",
       "**/?(*.)(spec|test).(jsx?|es6)",

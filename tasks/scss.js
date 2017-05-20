@@ -12,7 +12,7 @@ let autoprefixer = require('gulp-autoprefixer')
 
 module.exports = function (gulpConfig) {
   // Need to put this here so it has access to the gulpConfig
-  let cssTasks = require('./css')(gulpConfig)
+  let cssPipes = require('./css')(gulpConfig).pipes
 
   /**
    * Default SCSS config
@@ -38,12 +38,14 @@ module.exports = function (gulpConfig) {
       .pipe(scss(scssConfig.compileSCSS.scss))
       .pipe(autoprefixer(scssConfig.compileSCSS.autoprefixer))
       .pipe(gulp.dest(scssConfig.compileSCSS.dest))
-      .pipe(gulpif(gulpConfig.env !== 'development', cssTasks.minifyCSS()))
+      .pipe(gulpif(gulpConfig.env !== 'development', cssPipes.minifyCSS()))
   }
 
   // Public (will be turned into gulp tasks)
   return {
-    _config: scssConfig,
-    compileSCSS
+    config: scssConfig,
+    tasks: {
+      compileSCSS
+    }
   }
 }

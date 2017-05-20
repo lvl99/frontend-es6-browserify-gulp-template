@@ -5,8 +5,14 @@
 let gulp = require('gulp')
 let path = require('path')
 let del = require('del')
+let gulpif = require('gulp-if')
+let changed = require('gulp-changed')
+let lazypipe = require('lazypipe')
 
 module.exports = function (gulpConfig) {
+  // Task dependencies
+  let browsersyncServer = require('./browsersync')(gulpConfig).server
+
   /**
    * Clean the build directory
    */
@@ -16,8 +22,23 @@ module.exports = function (gulpConfig) {
       path.join(gulpConfig.buildDir, '*')])
   }
 
+  /**
+   * Copy files to build
+   */
+  let copyToBuild = lazypipe()
+    .pipe(changed, gulpConfig.buildDir)
+    .pipe(gulp.dest, gulpConfig.buildDir)
+    .pipe(function () {
+      return gulpif(gulpConfig.isWatching || browsersyncServer, browsersyncServer.stream())
+    })
+
   // Public (will be turned into gulp tasks)
   return {
-    cleanBuild
+    pipes: {
+      copyToBuild
+    },
+    tasks: {
+      cleanBuild
+    }
   }
 }
