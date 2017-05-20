@@ -131,7 +131,7 @@ Each task file should follow the same structure:
 
 ```javascript
 /**
- * Example Tasks
+ * Example
  */
 
 let gulp = require('gulp')
