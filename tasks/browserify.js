@@ -14,6 +14,7 @@ let watchify = require('watchify')
 let babelify = require('babelify')
 let streamify = require('gulp-streamify')
 let source = require('vinyl-source-stream')
+let chalk = require('chalk')
 let browsersyncServer = require('./browsersync')._server
 let jsTasks = require('./js')
 
@@ -21,6 +22,21 @@ let jsTasks = require('./js')
  * The generated bundlers
  */
 let bundlers = {}
+
+/**
+ * Nicer browserify errors
+ * Adapted from https://gist.github.com/Fishrock123/8ea81dad3197c2f84366
+ */
+function outputError(err) {
+  if (err.fileName) {
+    // Regular error
+    gutil.log(`${chalk.red(err.name)}: ${chalk.yellow(err.fileName)}: Line ${chalk.magenta(err.lineNumber)} & Column ${chalk.magenta(err.columnNumber || err.column)}: ${chalk.blue(err.description)}`)
+  } else {
+    // Browserify error
+    gutil.log(`${chalk.red(err.name)}: ${chalk.yellow(err.message)}`)
+  }
+  // this.emit('end')
+}
 
 module.exports = function (gulpConfig) {
   /**
@@ -94,7 +110,7 @@ module.exports = function (gulpConfig) {
     this.bundle = () => {
       gutil.log(`Bundling ${this.settings.name}...`)
       return this.bundler.bundle()
-        .on('error', gutil.log.bind(gutil, `Browserify: error detected in bundle ${this.settings.name}, aborting bundling...`))
+        .on('error', outputError)
         .pipe(source(this.destFile))
         .pipe(gulp.dest(this.dest))
         .pipe(gulpif(gulpConfig.env === 'production', streamify(jsTasks.minifyJS())))

@@ -12,6 +12,9 @@ let App = new AppInstance({
   // App settings go here
 })
 
+import
+export
+
 /**
  * Fire on jQuery ready
  */

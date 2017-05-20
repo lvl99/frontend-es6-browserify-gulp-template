@@ -18,7 +18,6 @@
   "license": "MIT",
   "dependencies": {
     "@fancyapps/fancybox": "^3.0.48",
-    "jquery": "^3.2.1",
     "normalize.css": "^7.0.0",
     "swiper": "^3.4.2"
   },
@@ -30,6 +29,7 @@
     "browserify": "^14.3.0",
     "browserify-shim": "^3.8.14",
     "browsersync": "0.0.1-security",
+    "chalk": "^1.1.3",
     "del": "^2.2.2",
     "extend": "^3.0.1",
     "gulp": "^3.9.1",
@@ -94,11 +94,16 @@
       "dest": "./build/vendors",
       "vendors": {
         "swiper": {
-          "src": "./node_modules/swiper/dist/**/*",
+          "src": [
+            "./node_modules/swiper/dist/css/swiper.min.css",
+            "./node_modules/swiper/dist/js/swiper.jquery.min.js"
+          ],
           "dest": "./build/vendors/swiper"
         },
         "fancybox": {
-          "src": "./node_modules/@fancyapps/fancybox/dist/**/*",
+          "src": [
+            "./node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.{js,css}"
+          ],
           "dest": "./build/vendors/fancybox"
         }
       }

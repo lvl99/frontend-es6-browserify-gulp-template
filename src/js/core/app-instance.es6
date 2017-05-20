@@ -14,6 +14,6 @@ module.exports = function AppInstance (options) {
 
   // Do all the app initialisation
   this.init = () => {
-    console.log('Why hello, World.')
+    console.log('Why hello, World. ❤️ from the console.')
   }
 }
