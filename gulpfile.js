@@ -12,6 +12,7 @@ let pkg = require('./package.json')
 let _gulpConfig = objectPath.get(pkg, 'gulpConfig') || {}
 let gulpConfig = extend({
   // Basic
+  env: process.env.NODE_ENV,
   srcDir: './src',
   buildDir: './build',
   staticDir: './static',

@@ -159,6 +159,7 @@ you're doing it wrong!
   }
 ```
 
+
 ## Third-party vendor plugins
 
 Third-party (otherwise known as "vendor") plugins all vary with their structure and support of modules. Some just want
