@@ -33,10 +33,10 @@ let tasks = {
   jest: require('./tasks/jest')(gulpConfig)
 }
 for (let taskGroupName in tasks) {
-  if (objectPath.has(tasks, taskGroupName)) {
+  if (tasks.hasOwnProperty(taskGroupName)) {
     for (let taskName in tasks[taskGroupName]) {
       // Omit any task property that starts with an "_"
-      if (!/^_/.test(taskName) && objectPath.has(tasks[taskGroupName], taskName)) {
+      if (!/^_/.test(taskName) && tasks[taskGroupName].hasOwnProperty(taskName)) {
         gulp.task(taskName, tasks[taskGroupName][taskName])
       }
     }
@@ -55,19 +55,19 @@ gulp.task('build', function () {
 // -- Build (Development)
 gulp.task('build:development', function () {
   gulpConfig.env = 'development'
-  return runSequence(['build'])
+  return runSequence('build')
 })
 
 // -- Build (Staging)
 gulp.task('build:staging', function () {
   gulpConfig.env = 'staging'
-  return runSequence(['build'])
+  return runSequence('build')
 })
 
 // -- Build (Production)
 gulp.task('build:production', function () {
   gulpConfig.env = 'production'
-  return runSequence(['build'])
+  return runSequence('build')
 })
 
 // -- Serve
@@ -77,21 +77,21 @@ gulp.task('serve', ['startServer', 'watch'])
 gulp.task('serve:development', function () {
   gulpConfig.env = 'development'
   gulpConfig.isWatching = true
-  return runSequence(['serve'])
+  return runSequence('serve')
 })
 
 // -- Build (Staging)
 gulp.task('serve:staging', function () {
   gulpConfig.env = 'staging'
   gulpConfig.isWatching = true
-  return runSequence(['serve'])
+  return runSequence('serve')
 })
 
 // -- Build (Production)
 gulp.task('serve:production', function () {
   gulpConfig.env = 'production'
   gulpConfig.isWatching = true
-  return runSequence(['serve'])
+  return runSequence('serve')
 })
 
 // -- Watch

@@ -107,7 +107,7 @@
       "bundles": {
         "app": {
           "src": "./src/js/app.es6",
-          "dest": "./build/js/bundle.app.js"
+          "dest": "./build/js/bundled.app.js"
         }
       }
     }

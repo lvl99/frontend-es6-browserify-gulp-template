@@ -3,7 +3,7 @@
 By Matt Scheurich [matt@lvl99.com](mailto:matt@lvl99.com)
 
 This template is just a starting point for developing and building ES6 JavaScript apps. It's not going to fit your app,
-but it is what I've started creating for myself as a project starting point after doing many different projects many
+but it is what I've started creating for myself as a base starting point after doing many different projects many
 different ways, but with the same essential components.
 
 It utilises Node.JS and `npm`, relying on `gulp`, `browserify` and `babel`. It supports an active development workflow
@@ -14,12 +14,12 @@ minification and concatenation which are run with `lazypipe`.
 
 There are some other ideas at play, namely using third-party vendor code as globals and how to include that into the
 build structure as well (notable for WordPress theme and plugin development). For this `browserify-shim` is required,
-especially if you need traditional node-like `require` behaviour to interop with vendor code that don't support CommonJS
-modules.
+especially if you need traditional node-like `require` behaviour to interop with vendor code that doesn't support
+CommonJS modules.
 
-Some people prefer Webpack, but I still really like Browserify. Admittedly this structure is complex, but build tasks
-and folder layouts are really quite opinionated and sometimes need to cover a lot of bases. Consider this one of many
-opinions!
+Some people prefer Webpack and its magic, but I still really like Browserify and having some direct control. Build tasks
+and folder layouts are really quite opinionated and sometimes need to cover a lot of bases and may not include solutions
+adequate for your conditions. Consider this one of many opinions!
 
 I hope this helps you to create your own successful app and build structure.
 
@@ -47,6 +47,7 @@ I hope this helps you to create your own successful app and build structure.
   |    ...
   + tasks/                    # I've split up the gulpfile.js into separate files for a more maintainable codebase
   + tests/                    # Folder to collect all the automated tests for the JS code
+  + vendors/                  # Holds third-party vendor files which then get integrated into the build 
     gulpfile.js               # The gulp controller which collates all the tasks files
     package.json              # NPM package definition, plus some extra configuration options (see `gulpConfig`)
 ```
@@ -61,19 +62,9 @@ I hope this helps you to create your own successful app and build structure.
 loading time
 
 
-## Stuff to be careful about
-
-* Requiring too many `npm` packages may bloat your app JS code. Ensure everything included is necessary and required
-for your app development, and be aware of package dependencies. If your JS code compiles and minifies to >1MB then
-you're doing it wrong!
-* Set `gulpConfig.env` to `development`, `staging` or `production` to affect minification and sourcemap generation. 
-
-| Feature         | `development` | `staging` | `production` |
-|-----------------|---------------|-----------|--------------|
-| Minification    |      No       |    Yes    |     Yes      |
-| Source Maps     |      No       |    Yes    |     Yes      |
-
 ## Conventions
+
+#### ES6 JavaScript file extensions
 
 Since ES6 is significantly different to ES5 and doesn't work in a lot of browsers, I like to name the frontend JS ES6
 files as `.es6` instead of `.js`. The benefit is that Babel already supports this naming convention, plus it is explicit
@@ -81,21 +72,97 @@ as to what the file is, and separates it from third-party vendor files which are
 `.js` files.
 
 
+#### Tasks
+
+Tasks (either single or sets of related tasks) have been split into separate files. This is done to manage the build
+runner codebase better, as well as make the build runner more modular, i.e. only `require` what you need. This means the
+`gulpfile.js` is purely about the order of tasks (otherwise known as "task recipes" -- completely arbitrary name) rather
+than what each task does.
+
+Each task file should follow the same structure:
+
+```ecmascript 6
+  /**
+   * My cool task 
+   */
+
+  let gulp = require('gulp')
+  let extend = require('extend')
+  let objectPath = require('object-path')
+  // blah blah blah...
+  
+  // Single export which is a function that takes the gulpConfig object
+  module.exports = function (gulpConfig) {
+    /**
+     * You could set up default config values for this task (or shared values for this set of tasks) 
+     */
+    let setConfig = extend({
+      // Default values...
+    }, objectPath.get(gulpConfig, 'setName'))
+    
+    /**
+     * A single task to perform 
+     */
+    function singleTaskName () {
+      // Your task code goes here
+      // gulp.src(...)
+      //   .pipe(gulp.dest(...))
+    }
+    
+    // The return value is a basic object with the task configuration and the task method itself
+    // This means you could change the config and other tasks can include this task method
+    return {
+      _config: setConfig,
+      taskName
+    }
+  }
+```
+
+When you come to integrating your task module into the `gulpfile.js`, you can require the task file then set each task
+method as a `gulp.task` manually, or require it in the `tasks` object for it to have all its public task methods
+automatically added to `gulp`.
+
+
 ## Gulp Config
 
 There is a `gulpConfig` object in the `package.json` which allows you to configure the build from one central point,
-however this shouldn't be completely relied on to solve all your build configuration. It's probable you may need to
-extend or modify the existing task files to support your apps specific needs.
+however this shouldn't be completely relied on to solve all your build configuration.
+
+It's probable you may need to extend or modify the `gulpConfig` in the `gulpfile.js`, or you can set or extend each
+separate task file configs to support your app's specific needs.
 
 As such, there is 'convention over configuration' at play and the `package.json` based configuration will solve your
-needs if you have nothing more or less to do that what is included in this template.
+needs if you have nothing more or less to do than what is included in this template.
 
+
+## Stuff to be careful about
+
+* Requiring too many `npm` packages may bloat your app JS code. Ensure everything included is necessary and required
+for your app development, and be aware of package dependencies. If your JS code compiles and minifies to >1MB then
+you're doing it wrong!
+
+* Set `gulpConfig.env` to `development`, `staging` or `production` to affect minification and sourcemap generation. 
+
+| Feature         | `development` | `staging` | `production` |
+|-----------------|---------------|-----------|--------------|
+| Minification    |      No       |    Yes    |     Yes      |
+| Source Maps     |      Yes      |    Yes    |     No       |
+
+* Support for `import`/`export` on Node.JS is tentative and not entirely reliable. Don't use it in task code (and I'd
+  recommend not using it in app code too, just for consistency).
+
+* If one task file relies on another task file, then require the dependent task file inside the exported function:
+```ecmascript 6
+  module.exports = function (gulpConfig) {
+    let otherTaskFile = require('./otherTaskFile')(gulpConfig)
+    // ... your task code
+  }
+```
 
 ## Third-party vendor plugins
 
 Third-party (otherwise known as "vendor") plugins all vary with their structure and support of modules. Some just want
-to attach to a global `jQuery` object, others have `cjs` or other such CommonJS/other modulular compatible versions
-available.
+to attach to a global `jQuery` object, others have `cjs` or other such CommonJS/other module compatible versions available.
 
 When you can't `import`/`require` third-party stuff into the JS, or there are extra assets and things which are
 required, you may want to just upload the whole vendor folder, or cherry-pick what you need for your app's purposes.
