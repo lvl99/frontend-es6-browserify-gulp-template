@@ -33,6 +33,15 @@ I hope this helps you to create your own successful app and build structure.
 loading time
 
 
+## Installation
+
+```bash
+  $ mkdir my-cool-app
+  $ cd my-cool-app
+  $ git clone --depth 1 git@github.com:lvl99/frontend-es6-browserify-gulp-template.git .
+```
+
+
 ## Structure
 
 ```
@@ -86,22 +95,22 @@ Set `gulpConfig.env` to `development`, `staging` or `production` to affect minif
 ### Package a build
 
 ```bash
-  gulp build                  # runs only build tasks
-  npm run build               # will autodetect the environment to run build tasks. Defaults to `production`
-  npm run build:development   
-  npm run build:staging
-  npm run build:production
+  $ gulp build                  # runs only build tasks
+  $ npm run build               # will autodetect the environment to run build tasks. Defaults to `production`
+  $ npm run build:development   
+  $ npm run build:staging
+  $ npm run build:production
 ```
 
 ### Active development build
 
 ```bash
-  gulp serve                  # runs only server and watch tasks
-  npm run dev                 # installs any npm dependencies before running `serve:development`
-  npm run serve               # will autodetect the environment to run serve tasks. Defaults to `production`
-  npm run serve:development
-  npm run serve:staging
-  npm run serve:production
+  $ gulp serve                  # runs only server and watch tasks
+  $ npm run dev                 # installs any npm dependencies before running `serve:development`
+  $ npm run serve               # will autodetect the environment to run serve tasks. Defaults to `production`
+  $ npm run serve:development
+  $ npm run serve:staging
+  $ npm run serve:production
 ```
 
 This uses Browsersync to create a web server with the build folder as the base directory and will open a new browser
