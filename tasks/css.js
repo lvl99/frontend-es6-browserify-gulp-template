@@ -31,7 +31,9 @@ module.exports = function (gulpConfig) {
    * Minify CSS files (using lazypipe)
    */
   let minifyCSS = lazypipe()
-    .pipe(gulpif(gulpConfig.env !== 'production', sourcemaps.init))
+    .pipe(function () {
+      return gulpif(gulpConfig.env !== 'production', sourcemaps.init)
+    })
     .pipe(uglifycss, cssConfig.minifyCSS.uglify)
     .pipe(rename, cssConfig.minifyCSS.rename)
     .pipe(function () {

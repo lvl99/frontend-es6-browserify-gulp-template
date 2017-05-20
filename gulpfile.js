@@ -12,7 +12,7 @@ let pkg = require('./package.json')
 let _gulpConfig = objectPath.get(pkg, 'gulpConfig') || {}
 let gulpConfig = extend({
   _root: __dirname,
-  env: process.env.NODE_ENV,
+  env: process.env.NODE_ENV || 'production',
   srcDir: './src',
   buildDir: './build',
   staticDir: './static',
@@ -52,6 +52,11 @@ gulp.task('build', function () {
   return runSequence('build.cleanBuild', ['static.copyStatic', 'vendors.processVendors'], ['less.compileLess', 'browserify.generateBundlers'])
 })
 
+// -- Build (autodetect environment)
+gulp.task('build:autodetect', function () {
+  return runSequence(`build:${process.env.NODE_ENV || 'production'}`)
+})
+
 // -- Build (Development)
 gulp.task('build:development', function () {
   gulpConfig.env = 'development'
@@ -72,6 +77,11 @@ gulp.task('build:production', function () {
 
 // -- Serve
 gulp.task('serve', ['browsersync.startServer', 'watch'])
+
+// -- Serve (autodetect environment)
+gulp.task('serve:autodetect', function () {
+  return runSequence(`serve:${process.env.NODE_ENV || 'production'}`)
+})
 
 // -- Serve (Development)
 gulp.task('serve:development', function () {

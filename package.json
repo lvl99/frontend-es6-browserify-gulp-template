@@ -5,11 +5,12 @@
   "main": "gulpfile.js",
   "scripts": {
     "test": "jest",
-    "build": "gulp build",
+    "dev": "npm install && npm run serve:development",
+    "build": "gulp build:autodetect",
     "build:development": "gulp build:development",
     "build:staging": "gulp build:staging",
     "build:production": "gulp build:production",
-    "serve": "gulp serve",
+    "serve": "gulp serve:autodetect",
     "serve:development": "gulp serve:development",
     "serve:staging": "gulp serve:staging",
     "serve:production": "gulp serve:production"

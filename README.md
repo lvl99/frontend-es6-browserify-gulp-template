@@ -71,12 +71,11 @@ Set `gulpConfig.env` to `development`, `staging` or `production` to affect minif
 | Minification    |      No       |    Yes    |     Yes      |
 | Source Maps     |      Yes      |    Yes    |     No       |
 
-> By default the build will inherit the `process.env.NODE_ENV` value
-
 ### Package a build
 
 ```bash
-  npm run build               # defaults to `development`
+  gulp build                  # runs only build tasks
+  npm run build               # will autodetect the environment to run build tasks. Defaults to `production`
   npm run build:development   
   npm run build:staging
   npm run build:production
@@ -85,8 +84,9 @@ Set `gulpConfig.env` to `development`, `staging` or `production` to affect minif
 ### Active development build
 
 ```bash
-  npm run serve               # defaults to `development`
-  npm run serve:development   
+  gulp serve                  # runs only server and watch tasks
+  npm run serve               # will autodetect the environment to run serve tasks. Defaults to `production`
+  npm run serve:development
   npm run serve:staging
   npm run serve:production
 ```
