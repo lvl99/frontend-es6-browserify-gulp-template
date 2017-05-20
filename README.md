@@ -39,6 +39,7 @@ loading time
   $ mkdir my-cool-app
   $ cd my-cool-app
   $ git clone --depth 1 git@github.com:lvl99/frontend-es6-browserify-gulp-template.git .
+  $ npm install
 ```
 
 
