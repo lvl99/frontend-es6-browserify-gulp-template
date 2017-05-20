@@ -179,7 +179,7 @@ method as a `gulp.task` manually, or require it in the `tasks` object for it to 
 automatically created as `gulp` tasks.
 
 
-#### Pipes
+### Pipes
 
 Gulp's strength is in its pipes, and gulp tasks are effectively collections of pipes. Sometimes you want to have
 reusable portions of grouped operations which can be plugged into multiple tasks. These are created and managed with
@@ -245,7 +245,7 @@ module.exports = function (gulpConfig) {
 ```
 
 
-#### Streaming or reloading files through Browsersync
+### Streaming or reloading files through Browsersync
 
 If you have a task that needs to stream the updated file or reload the file in the browser window (a.k.a. hot reload)
 then you will need to `require` the browsersync task and reference the `_server` property:
