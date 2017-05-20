@@ -62,6 +62,18 @@ loading time
 ```
 
 
+## Gulp Config
+
+There is a `gulpConfig` object in the `package.json` which allows you to configure the build from one central point,
+however this shouldn't be completely relied on to solve all your build configuration.
+
+It's probable you may need to extend or modify the `gulpConfig` object in the `gulpfile.js`, or you can set or extend
+each separate task configs to support your app's specific needs.
+
+As such, there is 'convention over configuration' at play and the `package.json` based configuration will solve your
+needs if you have nothing more or less to do than what is included in this template.
+
+
 ## Building
 
 Set `gulpConfig.env` to `development`, `staging` or `production` to affect minification and sourcemap generation. 
@@ -106,18 +118,6 @@ Since ES6 is significantly different to ES5 and doesn't work in a lot of browser
 files as `.es6` instead of `.js`. The benefit is that Babel already supports this naming convention, plus it is explicit
 as to what the file is, and separates it from third-party vendor files which are 99.9% compiled (and/or minified) ES5
 `.js` files.
-
-
-## Gulp Config
-
-There is a `gulpConfig` object in the `package.json` which allows you to configure the build from one central point,
-however this shouldn't be completely relied on to solve all your build configuration.
-
-It's probable you may need to extend or modify the `gulpConfig` in the `gulpfile.js`, or you can set or extend each
-separate task file configs to support your app's specific needs.
-
-As such, there is 'convention over configuration' at play and the `package.json` based configuration will solve your
-needs if you have nothing more or less to do than what is included in this template.
 
 
 ### Tasks
