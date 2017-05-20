@@ -85,6 +85,7 @@ Set `gulpConfig.env` to `development`, `staging` or `production` to affect minif
 
 ```bash
   gulp serve                  # runs only server and watch tasks
+  npm run dev                 # installs any npm dependencies before running `serve:development`
   npm run serve               # will autodetect the environment to run serve tasks. Defaults to `production`
   npm run serve:development
   npm run serve:staging
