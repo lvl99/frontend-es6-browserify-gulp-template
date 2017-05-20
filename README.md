@@ -119,45 +119,113 @@ Each task file should follow the same structure:
 
 ```ecmascript 6
 /**
- * My cool task
- * @location ./tasks/my-cool-task.js
+ * Example Tasks
  */
 
 let gulp = require('gulp')
 let extend = require('extend')
 let objectPath = require('object-path')
-// blah blah blah...
 
 // Single export which is a function that takes the gulpConfig object
 module.exports = function (gulpConfig) {
   /**
-   * You could set up default config values for this task (or shared values for this set of tasks) 
+   * Default task config 
    */
-  let setConfig = extend({
-    // Default values...
-  }, objectPath.get(gulpConfig, 'setName'))
+  let exampleConfig = extend({
+    // Put your tasks default configuration values here
+    src: path.join(gulpConfig.srcDir, '**/*'),
+    dest: gulpConfig.buildDir
+  }, objectPath.get(gulpConfig, 'example'))
   
   /**
    * A single task to perform 
    */
-  function singleTaskName () {
-    // Your task code goes here
-    // gulp.src(...)
-    //   .pipe(gulp.dest(...))
+  function exampleTask () {
+    // Your task operations go here...
+    return gulp.src(exampleConfig.src)
+      .pipe(gulp.dest(exampleConfig.dest))
   }
   
-  // The return value is a basic object with the task configuration and the task method itself
-  // This means you could change the config and other tasks can include this task method
+  // The public return value is a basic object with the task configuration and any related task methods
   return {
-    _config: setConfig,
-    taskName
+    config: exampleConfig,
+    tasks: {
+      exampleTask
+    }
   }
 }
 ```
 
 When you come to integrating your task module into the `gulpfile.js`, you can require the task file then set each task
-method as a `gulp.task` manually, or require it in the `tasks` object for it to have all its public task methods
-automatically added to `gulp`.
+method as a `gulp.task` manually, or require it in the `tasks` object for it to have all its public `tasks` methods
+automatically created as `gulp` tasks.
+
+
+#### Pipes
+
+Gulp's strength is in its pipes, and gulp tasks are effectively collections of pipes. Sometimes you want to have
+reusable portions of grouped operations which can be plugged into multiple tasks. These are created and managed with
+`lazypipe`.
+
+`lazypipe` pipes allow you to be modular and DRY across tasks with related actions. Coupled with `gulp-if` you can
+reduce or expand the pipe's functionality depending on other factors (like the `gulpConfig.env` value).
+
+```ecmascript 6
+/**
+ * Example
+ */
+
+let gulp = require('gulp')
+let extend = require('extend')
+let objectPath = require('object-path')
+let lazypipe = require('lazypipe')
+let gulpif = require('gulp-if')
+let uglify = require('gulp-uglify')
+
+// Single export which is a function that takes the gulpConfig object
+module.exports = function (gulpConfig) {
+  /**
+     * Default task config 
+     */
+    let exampleConfig = extend({
+      // Put your tasks default configuration values here
+      src: path.join(gulpConfig.srcDir, '**/*'),
+      dest: gulpConfig.buildDir,
+      // Extra task options to affect the pipe
+      minifyOptions: {}
+    }, objectPath.get(gulpConfig, 'example'))
+  
+  /**
+   * A reusable pipe
+   */
+  let examplePipe = lazypipe()
+    // Lazypipe requires you put the controller and its arguments separately
+    .pipe(uglify, exampleConfig.minifyOptions)
+    
+  /**
+   * A single task to perform 
+   */
+  function exampleTask () {
+    // Your task code goes here
+    return gulp.src(exampleConfig.src)
+      // Pipes can be inserted into tasks like normal
+      .pipe(examplePipe())
+      // The results of the pipe will then get put into the buildDir
+      .pipe(gulp.dest(exampleConfig.dest))
+  }
+  
+  return {
+    config: exampleConfig,
+    // You can publicly expose pipes so other tasks/modules can use them
+    pipes: {
+      examplePipe
+    },
+    tasks: {
+      exampleTask
+    }
+  }
+}
+```
 
 
 #### Streaming or reloading files through Browsersync
@@ -167,26 +235,122 @@ then you will need to `require` the browsersync task and reference the `_server`
  
 ```ecmascript 6
 /**
+ * Example
+ */
+
+let gulp = require('gulp')
+let extend = require('extend')
+let objectPath = require('object-path')
+let lazypipe = require('lazypipe')
+let gulpif = require('gulp-if')
+let uglify = require('gulp-uglify')
+
+// Single export which is a function that takes the gulpConfig object
+module.exports = function (gulpConfig) {
+  /**
+   * Default task config 
+   */
+  let exampleConfig = extend({
+    // Put your tasks default configuration values here
+    src: path.join(gulpConfig.srcDir, '**/*'),
+    dest: gulpConfig.buildDir,
+    // Extra task options to affect the pipe
+    minifyOptions: {}
+  }, objectPath.get(gulpConfig, 'example'))
+  
+  /**
+   * A reusable pipe
+   */
+  let examplePipe = lazypipe()
+    // Lazypipe requires you put the controller and its arguments separately
+    .pipe(uglify, exampleConfig.minifyOptions)
+    
+  /**
+   * A single task to perform 
+   */
+  function exampleTask () {
+    // Your task code goes here
+    return gulp.src(exampleConfig.src)
+      // Pipes can be inserted into tasks like normal
+      .pipe(examplePipe())
+      // The results of the pipe will then get put into the buildDir
+      .pipe(gulp.dest(exampleConfig.dest))
+  }
+  
+  return {
+    config: exampleConfig,
+    // You can publicly expose pipes so other tasks/modules can use them
+    pipes: {
+      examplePipe
+    },
+    tasks: {
+      exampleTask
+    }
+  }
+}
+
+
+/**
  * My cool task
  * @location ./tasks/my-cool-task.js
  */
 
 let gulp = require('gulp')
+let extend = require('extend')
+let objectPath = require('object-path')
+let lazypipe = require('lazypipe')
 let gulpif = require('gulp-if')
 
+// Single export which is a function that takes the gulpConfig object
 module.exports = function (gulpConfig) {
-  // Include the browsersync task module and reference the _server directly
-  let browsersyncServer = require('./browsersync')(gulpConfig)._server
+  /**
+   * Other tasks that this task is dependent on should be included here. They should always be initialised with the
+   * `gulpConfig` object
+   * To use browsersync for streaming/hot reload, we'll reference only the server property
+   */
+  let browsersyncServer = require('./browsersync')(gulpConfig).server
   
-  function myTask () {
-    gulp.src(/* glob */)
-      .pipe(/* process files */)
-      // I use `gulp-if` to help check whether to do something or not mid-pipe stream
-      .pipe(gulpif(browsersyncServer && gulpConfig.isWatching, browsersyncServer.stream())) // or browsersyncServer.reload()
+  /**
+   * Default task config 
+   */
+  let exampleConfig = extend({
+    // Put your tasks default configuration values here
+    src: path.join(gulpConfig.srcDir, '**/*'),
+    dest: gulpConfig.buildDir,
+    // Extra task options to affect the pipe
+    minifyOptions: {}
+  }, objectPath.get(gulpConfig, 'example'))
+  
+  /**
+   * A reusable pipe
+   */
+  let examplePipe = lazypipe()
+    // Lazypipe requires you put the controller and its arguments separately
+    .pipe(uglify, exampleConfig.minifyOptions)
+    
+  /**
+   * A single task to perform 
+   */
+  function exampleTask () {
+    // Your task code goes here
+    return gulp.src(exampleConfig.src)
+      .pipe(examplePipe())
+      .pipe(gulp.dest(exampleConfig.dest))
+      // After the files have been processed, we then stream them to the browsersync server (only if watching is enabled
+      // and the server has been initialised
+      .pipe(gulpif(gulpConfig.isWatching && browsersyncServer, browsersyncServer.stream())) // or browsersyncServer.reload()
   }
   
+  // The return value is a basic object with the task configuration and the task method itself
+  // This means you could change the config and other tasks can include this task method
   return {
-    myTask
+    config: setConfig,
+    pipes: {
+      examplePipe
+    },
+    tasks: {
+      exampleTask
+    }
   }
 }
 ```
