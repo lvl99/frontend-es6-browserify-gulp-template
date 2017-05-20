@@ -2,5 +2,5 @@
 
 // Run the tests using Jest functions
 test('Example', () => {
-  expect(0).toBe(0)
+  expect(1).toBe(1)
 })

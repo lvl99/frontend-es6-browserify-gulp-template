@@ -5,7 +5,7 @@
 
 const consts = {
   // You can turn off console logging by setting this to false
-  debug: true,
+  debug: false,
   exampleA: 'http://example.com',
   exampleB: 'lorem-ipsum'
 }

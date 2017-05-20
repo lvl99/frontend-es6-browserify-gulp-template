@@ -11,7 +11,7 @@ let runSequence = require('run-sequence').use(gulp)
 let pkg = require('./package.json')
 let _gulpConfig = objectPath.get(pkg, 'gulpConfig') || {}
 let gulpConfig = extend({
-  // Basic
+  _root: __dirname,
   env: process.env.NODE_ENV,
   srcDir: './src',
   buildDir: './build',
@@ -50,7 +50,7 @@ gulp.task('default', ['build'])
 
 // -- Build
 gulp.task('build', function () {
-  return runSequence(['cleanBuild', 'copyStatic', 'processVendors'], 'compileLess', ['runTests', 'generateBundlers'])
+  return runSequence(['cleanBuild', 'copyStatic', 'processVendors'], ['compileLess'], ['generateBundlers'])
 })
 
 // -- Build (Development)
@@ -78,21 +78,21 @@ gulp.task('serve', ['startServer', 'watch'])
 gulp.task('serve:development', function () {
   gulpConfig.env = 'development'
   gulpConfig.isWatching = true
-  return runSequence('serve')
+  return runSequence('serve', 'build')
 })
 
 // -- Build (Staging)
 gulp.task('serve:staging', function () {
   gulpConfig.env = 'staging'
   gulpConfig.isWatching = true
-  return runSequence('serve')
+  return runSequence('serve', 'build')
 })
 
 // -- Build (Production)
 gulp.task('serve:production', function () {
   gulpConfig.env = 'production'
   gulpConfig.isWatching = true
-  return runSequence('serve')
+  return runSequence('serve', 'build')
 })
 
 // -- Watch

@@ -24,6 +24,15 @@ adequate for your conditions. Consider this one of many opinions!
 I hope this helps you to create your own successful app and build structure.
 
 
+## Why?
+
+1. Write in modern ES6 JavaScript and transpile to ES5 JS for browser compatibility
+2. Compile and package modular JS code into bundles
+3. Use CSS preprocessors (LESS and SCSS) to compile CSS bundles and cross-browser compatibility (`autoprefixer`)
+4. Minify and concatenate JS and CSS bundles and third-party vendor code into as few files as possible to reduce
+loading time
+
+
 ## Structure
 
 ```
@@ -53,18 +62,44 @@ I hope this helps you to create your own successful app and build structure.
 ```
 
 
-## Why?
+## Building
 
-1. Write in modern ES6 JavaScript and transpile to ES5 JS for browser compatibility
-2. Compile and package modular JS code into bundles
-3. Use CSS preprocessors (LESS and SCSS) to compile CSS bundles and cross-browser compatibility (`autoprefixer`)
-4. Minify and concatenate JS and CSS bundles and third-party vendor code into as few files as possible to reduce
-loading time
+Set `gulpConfig.env` to `development`, `staging` or `production` to affect minification and sourcemap generation. 
+
+| Feature         | `development` | `staging` | `production` |
+|-----------------|---------------|-----------|--------------|
+| Minification    |      No       |    Yes    |     Yes      |
+| Source Maps     |      Yes      |    Yes    |     No       |
+
+> By default the build will inherit the `process.env.NODE_ENV` value
+
+### Package a build
+
+```bash
+  npm run build               # defaults to `development`
+  npm run build:development   
+  npm run build:staging
+  npm run build:production
+```
+
+### Active development build
+
+```bash
+  npm run serve               # defaults to `development`
+  npm run serve:development   
+  npm run serve:staging
+  npm run serve:production
+```
+
+This uses Browsersync to create a web server with the build folder as the base directory and will open a new browser
+window.
+
+By default the address is `http://localhost:3000` but of course this is all configurable.
 
 
 ## Conventions
 
-#### ES6 JavaScript file extensions
+### ES6 JavaScript file extensions
 
 Since ES6 is significantly different to ES5 and doesn't work in a lot of browsers, I like to name the frontend JS ES6
 files as `.es6` instead of `.js`. The benefit is that Babel already supports this naming convention, plus it is explicit
@@ -72,7 +107,7 @@ as to what the file is, and separates it from third-party vendor files which are
 `.js` files.
 
 
-#### Tasks
+### Tasks
 
 Tasks (either single or sets of related tasks) have been split into separate files. This is done to manage the build
 runner codebase better, as well as make the build runner more modular, i.e. only `require` what you need. This means the
@@ -82,45 +117,81 @@ than what each task does.
 Each task file should follow the same structure:
 
 ```ecmascript 6
-  /**
-   * My cool task 
-   */
+/**
+ * My cool task
+ * @location ./tasks/my-cool-task.js
+ */
 
-  let gulp = require('gulp')
-  let extend = require('extend')
-  let objectPath = require('object-path')
-  // blah blah blah...
+let gulp = require('gulp')
+let extend = require('extend')
+let objectPath = require('object-path')
+// blah blah blah...
+
+// Single export which is a function that takes the gulpConfig object
+module.exports = function (gulpConfig) {
+  /**
+   * You could set up default config values for this task (or shared values for this set of tasks) 
+   */
+  let setConfig = extend({
+    // Default values...
+  }, objectPath.get(gulpConfig, 'setName'))
   
-  // Single export which is a function that takes the gulpConfig object
-  module.exports = function (gulpConfig) {
-    /**
-     * You could set up default config values for this task (or shared values for this set of tasks) 
-     */
-    let setConfig = extend({
-      // Default values...
-    }, objectPath.get(gulpConfig, 'setName'))
-    
-    /**
-     * A single task to perform 
-     */
-    function singleTaskName () {
-      // Your task code goes here
-      // gulp.src(...)
-      //   .pipe(gulp.dest(...))
-    }
-    
-    // The return value is a basic object with the task configuration and the task method itself
-    // This means you could change the config and other tasks can include this task method
-    return {
-      _config: setConfig,
-      taskName
-    }
+  /**
+   * A single task to perform 
+   */
+  function singleTaskName () {
+    // Your task code goes here
+    // gulp.src(...)
+    //   .pipe(gulp.dest(...))
   }
+  
+  // The return value is a basic object with the task configuration and the task method itself
+  // This means you could change the config and other tasks can include this task method
+  return {
+    _config: setConfig,
+    taskName
+  }
+}
 ```
 
 When you come to integrating your task module into the `gulpfile.js`, you can require the task file then set each task
 method as a `gulp.task` manually, or require it in the `tasks` object for it to have all its public task methods
 automatically added to `gulp`.
+
+
+#### Streaming or reloading files through Browsersync
+
+If you have a task that needs to stream the updated file or reload the file in the browser window (a.k.a. hot reload)
+then you will need to `require` the browsersync task and reference the `_server` property:
+ 
+```ecmascript 6
+/**
+ * My cool task
+ * @location ./tasks/my-cool-task.js
+ */
+
+let gulp = require('gulp')
+let gulpif = require('gulp-if')
+
+module.exports = function (gulpConfig) {
+  // Include the browsersync task module and reference the _server directly
+  let browsersyncServer = require('./browsersync')(gulpConfig)._server
+  
+  function myTask () {
+    gulp.src(/* glob */)
+      .pipe(/* process files */)
+      // I use `gulp-if` to help check whether to do something or not mid-pipe stream
+      .pipe(gulpif(browsersyncServer && gulpConfig.isWatching, browsersyncServer.stream())) // or browsersyncServer.reload()
+  }
+  
+  return {
+    myTask
+  }
+}
+```
+
+> ***IMPORTANT***: if you need the streaming/reload feature, then you should definitely ensure the browsersync tasks are
+run and that the Browsersync server is initialised before any other tasks rely on it.
 
 
 ## Gulp Config
@@ -140,13 +211,6 @@ needs if you have nothing more or less to do than what is included in this templ
 * Requiring too many `npm` packages may bloat your app JS code. Ensure everything included is necessary and required
 for your app development, and be aware of package dependencies. If your JS code compiles and minifies to >1MB then
 you're doing it wrong!
-
-* Set `gulpConfig.env` to `development`, `staging` or `production` to affect minification and sourcemap generation. 
-
-| Feature         | `development` | `staging` | `production` |
-|-----------------|---------------|-----------|--------------|
-| Minification    |      No       |    Yes    |     Yes      |
-| Source Maps     |      Yes      |    Yes    |     No       |
 
 * Support for `import`/`export` on Node.JS is tentative and not entirely reliable. Don't use it in task code (and I'd
   recommend not using it in app code too, just for consistency).
@@ -178,7 +242,10 @@ build with the vendors tasks.
 
 ## Tests
 
-Because it's always good to test! I've included Jest if you want to use it.
+Because it's always good to test (in theory!). I've included Jest if you want to use it. I haven't done enough with
+tests and Jest to know what I'm doing there, but I'm starting to get into it.
+
+Tests are run separate to the build tasks, so you can just `npm run test`.
 
 
 ## Tips
