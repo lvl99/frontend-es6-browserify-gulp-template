@@ -15,7 +15,7 @@
     "serve:staging": "gulp serve:staging",
     "serve:production": "gulp serve:production"
   },
-  "author": "Matt Scheurich <matt@blacksmith.studio>",
+  "author": "Matt Scheurich <matt@lvl99.com>",
   "license": "MIT",
   "dependencies": {
     "@fancyapps/fancybox": "^3.0.48",
