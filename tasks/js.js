@@ -34,8 +34,8 @@ module.exports = function (gulpConfig) {
     .pipe(function () {
       return gulpif(gulpConfig.env !== 'production', sourcemaps.init)
     })
-    .pipe(uglify, jsConfig.minifyJS.uglify)
-    .pipe(rename, jsConfig.minifyJS.rename)
+    .pipe(uglify, objectPath.get(jsConfig, 'minifyJS.uglify'))
+    .pipe(rename, objectPath.get(jsConfig, 'minifyJS.rename'))
     .pipe(function () {
       return gulpif(gulpConfig.env !== 'production', sourcemaps.write({
         loadMaps: true
@@ -46,11 +46,11 @@ module.exports = function (gulpConfig) {
    * Concat JS files using lazypipe
    */
   let concatJS = lazypipe()
-    .pipe(concat, jsConfig.concatJS.destFile)
+    .pipe(concat, objectPath.get(jsConfig, 'concatJS.destFile'))
 
   // Public (will be turned into gulp tasks)
   return {
-    _config: jsConfig,
+    config: jsConfig,
     pipes: {
       minifyJS,
       concatJS

@@ -34,8 +34,8 @@ module.exports = function (gulpConfig) {
     .pipe(function () {
       return gulpif(gulpConfig.env !== 'production', sourcemaps.init)
     })
-    .pipe(uglifycss, cssConfig.minifyCSS.uglify)
-    .pipe(rename, cssConfig.minifyCSS.rename)
+    .pipe(uglifycss, objectPath.get(cssConfig, 'minifyCSS.uglify'))
+    .pipe(rename, objectPath.get(cssConfig, 'minifyCSS.rename'))
     .pipe(function () {
       return gulpif(gulpConfig.env !== 'production', sourcemaps.write({
         loadMaps: true
@@ -46,7 +46,7 @@ module.exports = function (gulpConfig) {
    * Concat CSS files (using lazypipe)
    */
   let concatCSS = lazypipe()
-    .pipe(concat, cssConfig.concatCSS.destFile)
+    .pipe(concat, objectPath.get(cssConfig, 'concatCSS.destFile'))
 
   // Public (will be turned into gulp tasks)
   return {
