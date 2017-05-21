@@ -302,7 +302,7 @@ module.exports = function (gulpConfig) {
   }
   
   return {
-    config: setConfig,
+    config: exampleConfig,
     pipes: {
       examplePipe
     },
