@@ -277,9 +277,9 @@ module.exports = function (gulpConfig) {
   /**
    * Other tasks that this task is dependent on should be included here. They should always be initialised
    * with the `gulpConfig` object.
-   * To use browsersync for streaming/hot reload, we'll reference only the server property
+   * To use browsersync for streaming/hot reload, we'll get the necessary pre-made pipes to stream/reload
    */
-  let browsersyncServer = require('./browsersync')(gulpConfig).server
+  let serverPipes = require('./browsersync')(gulpConfig).pipes
   
   let exampleConfig = extend({
     src: path.join(gulpConfig.srcDir, '**/*'),
@@ -295,10 +295,10 @@ module.exports = function (gulpConfig) {
       .pipe(gulpif(gulpConfig.env !== 'development', examplePipe()))
       .pipe(gulp.dest(exampleConfig.dest))
       /**
-       * After the files have been processed, we then stream them to the browsersync server (only if watching is enabled
-       * and the server has been initialised
+       * After the files have been processed, we then stream them to the browsersync server
+       * (only if watching is enabled and the server has been initialised)
        */
-      .pipe(gulpif(gulpConfig.isWatching && browsersyncServer, browsersyncServer.stream())) // or browsersyncServer.reload()
+      .pipe(serverPipes.streamToServer())
   }
   
   return {
