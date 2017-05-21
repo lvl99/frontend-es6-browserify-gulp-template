@@ -327,7 +327,7 @@ you're doing it wrong!
   recommend not using it in app code too, just for consistency).
 
 * If one task file relies on another task file, then require the dependent task file inside the exported function:
-```ecmascript 6
+```javascript
   module.exports = function (gulpConfig) {
     let otherTaskFile = require('./otherTaskFile')(gulpConfig)
     // ... your task code
