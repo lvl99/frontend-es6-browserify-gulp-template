@@ -232,7 +232,8 @@ module.exports = function (gulpConfig) {
       /**
        * Pipes can be inserted into tasks like normal 
        */
-      .pipe(examplePipe())
+      // Using `gulp-if` I can control if this pipe would be run
+      .pipe(gulpif(gulpConfig.env !== 'development', examplePipe()))
       /**
        * The results of the pipe will then get put into the buildDir
        */
