@@ -292,7 +292,7 @@ module.exports = function (gulpConfig) {
 
   function exampleTask () {
     return gulp.src(exampleConfig.src)
-      .pipe(examplePipe())
+      .pipe(gulpif(gulpConfig.env !== 'development', examplePipe()))
       .pipe(gulp.dest(exampleConfig.dest))
       /**
        * After the files have been processed, we then stream them to the browsersync server (only if watching is enabled
