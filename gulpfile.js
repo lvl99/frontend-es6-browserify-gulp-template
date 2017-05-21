@@ -107,8 +107,7 @@ gulp.task('serve:production', function () {
 // -- Watch
 gulp.task('watch', function () {
   gulpConfig.isWatching = true
-
-  gulp.watch(tasks.static.config.watchSrc, ['static.copyStatic'])
-  gulp.watch(tasks.less.config.watchSrc, ['less.compileLess'])
-  gulp.watch(tasks.scss.config.watchSrc, ['scss.compileSCSS'])
+  gulp.watch(tasks.static.config.watchSrc, ['static.copyStatic', tasks.browsersync.server.stream])
+  gulp.watch(tasks.less.config.watchSrc, ['less.compileLess', tasks.browsersync.server.stream])
+  gulp.watch(tasks.scss.config.watchSrc, ['scss.compileSCSS', tasks.browsersync.server.stream])
 })

@@ -10,6 +10,7 @@ let rename = require('gulp-rename')
 let concat = require('gulp-concat')
 let sourcemaps = require('gulp-sourcemaps')
 let uglifycss = require('gulp-uglifycss')
+let autoprefixer = require('gulp-autoprefixer')
 
 module.exports = function (gulpConfig) {
   /**
@@ -24,6 +25,12 @@ module.exports = function (gulpConfig) {
     },
     concatCSS: {
       destFile: undefined
+    },
+    postProcessCSS: {
+      autoprefixer: {
+        browsers: ['last 2 versions', '> 1%'],
+        cascade: true
+      }
     }
   }, objectPath.get(gulpConfig, 'css'))
 
@@ -32,7 +39,7 @@ module.exports = function (gulpConfig) {
    */
   let minifyCSS = lazypipe()
     .pipe(function () {
-      return gulpif(gulpConfig.env !== 'production', sourcemaps.init)
+      return gulpif(gulpConfig.env !== 'production', sourcemaps.init())
     })
     .pipe(uglifycss, objectPath.get(cssConfig, 'minifyCSS.uglify'))
     .pipe(rename, objectPath.get(cssConfig, 'minifyCSS.rename'))
@@ -48,12 +55,19 @@ module.exports = function (gulpConfig) {
   let concatCSS = lazypipe()
     .pipe(concat, objectPath.get(cssConfig, 'concatCSS.destFile'))
 
+  /**
+   * Post-process CSS files (using autoprefixer)
+   */
+  let postProcessCSS = lazypipe()
+    .pipe(autoprefixer, objectPath.get(cssConfig, 'postProcessCSS.autoprefixer'))
+
   // Public (will be turned into gulp tasks)
   return {
     config: cssConfig,
     pipes: {
       minifyCSS,
-      concatCSS
+      concatCSS,
+      postProcessCSS
     }
   }
 }

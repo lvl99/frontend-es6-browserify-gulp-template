@@ -8,11 +8,11 @@ let path = require('path')
 let objectPath = require('object-path')
 let extend = require('extend')
 let less = require('gulp-less')
-let autoprefixer = require('gulp-autoprefixer')
 
 module.exports = function (gulpConfig) {
-  // Need to put these here
+  // Task dependencies
   let cssPipes = require('./css')(gulpConfig).pipes
+  let serverPipes = require('./browsersync')(gulpConfig).pipes
 
   /**
    * Default LESS config
@@ -22,11 +22,7 @@ module.exports = function (gulpConfig) {
     compileLess: {
       src: ['./src/less/*.less'],
       dest: path.join(gulpConfig.buildDir, 'css'),
-      less: {},
-      autoprefixer: {
-        browsers: ['last 2 versions', '> 1%'],
-        cascade: true
-      }
+      less: {}
     }
   }, objectPath.get(gulpConfig, 'less'))
 
@@ -35,10 +31,14 @@ module.exports = function (gulpConfig) {
    */
   function compileLess () {
     return gulp.src(lessConfig.compileLess.src)
-      .pipe(less(lessConfig.compileLess.less))
-      .pipe(autoprefixer(lessConfig.compileLess.autoprefixer))
+      .pipe(less(objectPath.get(lessConfig, 'compileLess.less')))
+      .pipe(cssPipes.postProcessCSS())
       .pipe(gulp.dest(lessConfig.compileLess.dest))
+      // Minify
       .pipe(gulpif(gulpConfig.env !== 'development', cssPipes.minifyCSS()))
+      .pipe(gulpif(gulpConfig.env !== 'development', gulp.dest(lessConfig.compileLess.dest)))
+      // Update file on browser/server
+      .pipe(serverPipes.streamToServer())
   }
 
   // Public (will be turned into gulp tasks)

@@ -23,8 +23,8 @@ let escapeRegExp = require('lodash.escaperegexp')
 let bundlers = {}
 
 module.exports = function (gulpConfig) {
-  // Dependent tasks
-  let browsersyncServer = require('./browsersync')(gulpConfig).server
+  // Task dependencies
+  let serverPipes = require('./browsersync')(gulpConfig).pipes
   let jsPipes = require('./js')(gulpConfig).pipes
 
   /**
@@ -95,16 +95,8 @@ module.exports = function (gulpConfig) {
       this.settings.browserify.entries = [this.settings.src]
     }
 
-    // Create the browserify bundler (with Babel transforms)
+    // Create the browserify bundler
     this.bundler = browserify(this.settings.browserify).transform(pkgify).transform(babelify)
-
-    // Allow remapping of paths (a.k.a. path aliases) via pkgify
-    // if (this.settings.pkgify && this.settings.pkgify.length) {
-    //   this.bundler.transform(pkgify)
-    // }
-
-    // Do babel transform
-    // this.bundler.transform(babelify)
 
     // Use watchify
     if (gulpConfig.isWatching || bundlesConfig.useWatchify || useWatchify) {
@@ -120,9 +112,11 @@ module.exports = function (gulpConfig) {
         .on('error', outputError)
         .pipe(source(this.destFile))
         .pipe(gulp.dest(this.dest))
-        .pipe(gulpif(gulpConfig.env === 'production', streamify(jsPipes.minifyJS())))
-        .pipe(gulpif(gulpConfig.env === 'production', gulp.dest(this.dest)))
-        .pipe(gulpif(browsersyncServer && gulpConfig.isWatching || bundlesConfig.useWatchify || useWatchify, browsersyncServer.stream()))
+        // Minify the JS
+        .pipe(gulpif(gulpConfig.env !== 'development', streamify(jsPipes.minifyJS())))
+        .pipe(gulpif(gulpConfig.env !== 'development', gulp.dest(this.dest)))
+        // Update the file in the browser
+        .pipe(serverPipes.streamToServer())
     }
 
     // Events

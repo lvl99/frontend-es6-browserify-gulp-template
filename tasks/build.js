@@ -11,7 +11,7 @@ let lazypipe = require('lazypipe')
 
 module.exports = function (gulpConfig) {
   // Task dependencies
-  let browsersyncServer = require('./browsersync')(gulpConfig).server
+  let serverPipes = require('./browsersync')(gulpConfig).pipes
 
   /**
    * Clean the build directory
@@ -28,9 +28,7 @@ module.exports = function (gulpConfig) {
   let copyToBuild = lazypipe()
     .pipe(changed, gulpConfig.buildDir)
     .pipe(gulp.dest, gulpConfig.buildDir)
-    .pipe(function () {
-      return gulpif(gulpConfig.isWatching || browsersyncServer, browsersyncServer.stream())
-    })
+    .pipe(serverPipes.streamToServer)
 
   // Public (will be turned into gulp tasks)
   return {

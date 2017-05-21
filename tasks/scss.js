@@ -8,11 +8,11 @@ let path = require('path')
 let objectPath = require('object-path')
 let extend = require('extend')
 let scss = require('gulp-sass')
-let autoprefixer = require('gulp-autoprefixer')
 
 module.exports = function (gulpConfig) {
-  // Need to put this here so it has access to the gulpConfig
+  // Task dependencies
   let cssPipes = require('./css')(gulpConfig).pipes
+  let serverPipes = require('./browsersync')(gulpConfig).pipes
 
   /**
    * Default SCSS config
@@ -22,11 +22,7 @@ module.exports = function (gulpConfig) {
     compileSCSS: {
       src: ['./src/{sass,scss}/*.{sass,scss}'],
       dest: path.join(gulpConfig.buildDir, 'css'),
-      scss: {},
-      autoprefixer: {
-        browsers: ['last 2 versions', '> 1%'],
-        cascade: true
-      }
+      scss: {}
     }
   }, objectPath.get(gulpConfig, 'scss'))
 
@@ -36,9 +32,13 @@ module.exports = function (gulpConfig) {
   function compileSCSS () {
     return gulp.src(scssConfig.compileSCSS.src)
       .pipe(scss(scssConfig.compileSCSS.scss))
-      .pipe(autoprefixer(scssConfig.compileSCSS.autoprefixer))
+      .pipe(cssPipes.postProcessCSS())
       .pipe(gulp.dest(scssConfig.compileSCSS.dest))
+      // Minify
       .pipe(gulpif(gulpConfig.env !== 'development', cssPipes.minifyCSS()))
+      .pipe(gulpif(gulpConfig.env !== 'development', gulp.dest(scssConfig.compileSCSS.dest)))
+      // Update file on browser/server
+      .pipe(serverPipes.streamToServer())
   }
 
   // Public (will be turned into gulp tasks)

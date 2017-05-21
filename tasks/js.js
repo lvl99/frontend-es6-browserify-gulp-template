@@ -31,8 +31,8 @@ module.exports = function (gulpConfig) {
    * Minify JS files using lazypipe
    */
   let minifyJS = lazypipe()
-    .pipe(function () {
-      return gulpif(gulpConfig.env !== 'production', sourcemaps.init)
+    .pipe(function() {
+      return gulpif(gulpConfig.env !== 'production', sourcemaps.init())
     })
     .pipe(uglify, objectPath.get(jsConfig, 'minifyJS.uglify'))
     .pipe(rename, objectPath.get(jsConfig, 'minifyJS.rename'))
