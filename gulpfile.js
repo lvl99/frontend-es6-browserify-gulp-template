@@ -6,6 +6,7 @@ let gulp = require('gulp')
 let objectPath = require('object-path')
 let extend = require('extend')
 let runSequence = require('run-sequence').use(gulp)
+require('./tasks/_gulpErrorHandling')
 
 // Gulp config
 let pkg = require('./package.json')
